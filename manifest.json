@@ -1,0 +1,105 @@
+{
+  "name": "Marbrerie Pro",
+  "short_name": "Marbrerie",
+  "description": "Gestion complète pour votre marbrerie - Clients, Factures, Stock, Employés",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7fa",
+  "theme_color": "#2c3e50",
+  "lang": "fr",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067256.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067256.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067256.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067256.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067256.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067256.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067256.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067256.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://via.placeholder.com/640x320/2c3e50/ffffff?text=Marbrerie+Pro+Dashboard",
+      "sizes": "640x320",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tableau de bord Marbrerie Pro"
+    }
+  ],
+  "categories": [
+    "business",
+    "productivity",
+    "finance"
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouveau Client",
+      "short_name": "Client",
+      "description": "Ajouter un nouveau client",
+      "url": "/#client",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/512/1077/1077114.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Nouvelle Facture",
+      "short_name": "Facture",
+      "description": "Créer une nouvelle facture",
+      "url": "/#facturation",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
+}
