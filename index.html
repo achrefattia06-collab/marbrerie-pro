@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marbrerie Pro - Gestion Complète</title>
+    
+    <!-- META POUR PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- SUPABASE -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- FONTAWESOME -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* VOS STYLES CSS EXISTANTS - Gardez tout votre CSS ici */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #2c3e50; --secondary: #3498db; --success: #27ae60;
+            --danger: #e74c3c; --warning: #f39c12; --light: #ecf0f1;
+            --dark: #2c3e50; --gray: #95a5a6; --lighter: #f8f9fa;
+            --gradient-primary: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            --gradient-success: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            --gradient-danger: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
+            --radius: 12px; --radius-sm: 8px;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333; min-height: 100vh;
+        }
+        
+        /* GARDEZ TOUT VOTRE CSS ICI */
+        /* ... [COLLER TOUT VOTRE CSS D'ORIGINE ICI] ... */
+    </style>
+</head>
+<body>
+    <!-- VOTRE HTML D'ORIGINE -->
+    <!-- ... [COLLER TOUT VOTRE HTML D'ORIGINE ICI] ... -->
+
+    <script>
+        // CONFIGURATION SUPABASE (À MODIFIER AVEC VOS CLÉS)
+        const supabaseUrl = 'https://votre-projet.supabase.co';
+        const supabaseKey = 'votre-cle-supabase';
+        
+        // Initialisation Supabase
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // VARIABLES GLOBALES
+        let currency = 'DT';
+        let currentFacture = [];
+        let selectedArticle = null;
+        
+        // INITIALISATION
+        document.addEventListener('DOMContentLoaded', function() {
+            initNavigation();
+            loadClientsFromDB();
+            loadArticlesFromDB();
+            loadEmployesFromDB();
+            loadFacturesFromDB();
+            // ... autres initialisations
+        });
+        
+        // ======================
+        // FONCTIONS SUPABASE
+        // ======================
+        
+        // 1. CLIENTS
+        async function loadClientsFromDB() {
+            try {
+                const { data, error } = await supabase
+                    .from('clients')
+                    .select('*')
+                    .order('date_creation', { ascending: false });
+                    
+                if (error) throw error;
+                
+                // Afficher les clients
+                displayClients(data);
+            } catch (error) {
+                console.error('Erreur chargement clients:', error);
+                showNotification('Erreur de connexion à la base de données', 'error');
+            }
+        }
+        
+        async function saveClientToDB(clientData) {
+            try {
+                const { data, error } = await supabase
+                    .from('clients')
+                    .insert([clientData])
+                    .select();
+                    
+                if (error) throw error;
+                
+                showNotification('Client enregistré avec succès!', 'success');
+                loadClientsFromDB();
+                return data[0];
+            } catch (error) {
+                console.error('Erreur sauvegarde client:', error);
+                showNotification('Erreur lors de la sauvegarde', 'error');
+            }
+        }
+        
+        // 2. ARTICLES
+        async function loadArticlesFromDB() {
+            try {
+                const { data, error } = await supabase
+                    .from('articles')
+                    .select('*')
+                    .order('nom');
+                    
+                if (error) throw error;
+                
+                // Afficher les articles
+                displayArticles(data);
+            } catch (error) {
+                console.error('Erreur chargement articles:', error);
+            }
+        }
+        
+        async function saveArticleToDB(articleData) {
+            try {
+                const { data, error } = await supabase
+                    .from('articles')
+                    .insert([articleData])
+                    .select();
+                    
+                if (error) throw error;
+                
+                showNotification('Article enregistré avec succès!', 'success');
+                loadArticlesFromDB();
+                return data[0];
+            } catch (error) {
+                console.error('Erreur sauvegarde article:', error);
+                showNotification('Erreur lors de la sauvegarde', 'error');
+            }
+        }
+        
+        // 3. FACTURES
+        async function saveFactureToDB(factureData) {
+            try {
+                const { data, error } = await supabase
+                    .from('factures')
+                    .insert([factureData])
+                    .select();
+                    
+                if (error) throw error;
+                
+                showNotification('Facture enregistrée avec succès!', 'success');
+                loadFacturesFromDB();
+                return data[0];
+            } catch (error) {
+                console.error('Erreur sauvegarde facture:', error);
+                showNotification('Erreur lors de la sauvegarde', 'error');
+            }
+        }
+        
+        async function loadFacturesFromDB() {
+            try {
+                const { data, error } = await supabase
+                    .from('factures')
+                    .select(`
+                        *,
+                        clients (nom, tel)
+                    `)
+                    .order('date', { ascending: false });
+                    
+                if (error) throw error;
+                
+                // Afficher les factures
+                displayFactures(data);
+            } catch (error) {
+                console.error('Erreur chargement factures:', error);
+            }
+        }
+        
+        // 4. EMPLOYÉS
+        async function loadEmployesFromDB() {
+            try {
+                const { data, error } = await supabase
+                    .from('employes')
+                    .select('*')
+                    .order('nom');
+                    
+                if (error) throw error;
+                
+                displayEmployes(data);
+            } catch (error) {
+                console.error('Erreur chargement employés:', error);
+            }
+        }
+        
+        // ======================
+        // MODIFIEZ VOS FONCTIONS EXISTANTES
+        // ======================
+        
+        // AU LIEU DE localStorage, utilisez Supabase
+        
+        function saveClient() {
+            const nom = document.getElementById('client-nom').value.trim();
+            const adresse = document.getElementById('client-adresse').value.trim();
+            const email = document.getElementById('client-email').value.trim();
+            const tel = document.getElementById('client-tel').value.trim();
+            
+            if (!nom) {
+                showNotification('Le nom du client est requis', 'error');
+                return;
+            }
+            
+            const clientData = {
+                nom,
+                adresse,
+                email,
+                tel,
+                date_creation: new Date().toISOString()
+            };
+            
+            saveClientToDB(clientData).then(() => {
+                // Réinitialiser le formulaire
+                document.getElementById('client-nom').value = '';
+                document.getElementById('client-adresse').value = '';
+                document.getElementById('client-email').value = '';
+                document.getElementById('client-tel').value = '';
+            });
+        }
+        
+        function saveArticle() {
+            const nom = document.getElementById('article-nom').value.trim();
+            const type = document.getElementById('article-type').value.trim();
+            const unite = document.getElementById('article-unite').value;
+            const prix = parseFloat(document.getElementById('article-prix').value);
+            const prixAchat = parseFloat(document.getElementById('article-prix-achat').value);
+            const quantite = parseFloat(document.getElementById('article-quantite').value) || 0;
+            const largeur = unite === 'ml' ? parseFloat(document.getElementById('article-largeur').value) || 0.6 : null;
+            
+            if (!nom || !type || !prix || prix <= 0) {
+                showNotification('Veuillez remplir tous les champs correctement', 'error');
+                return;
+            }
+            
+            const articleData = {
+                nom,
+                type,
+                prix,
+                unite,
+                largeur,
+                quantite,
+                prix_achat: prixAchat
+            };
+            
+            saveArticleToDB(articleData).then(() => {
+                // Fermer modal et réinitialiser
+                closeModal('article-modal');
+                document.getElementById('article-nom').value = '';
+                document.getElementById('article-type').value = '';
+                document.getElementById('article-prix').value = '';
+                document.getElementById('article-prix-achat').value = '';
+                document.getElementById('article-quantite').value = '0';
+                document.getElementById('article-largeur').value = '0.6';
+                document.getElementById('article-unite').value = 'm2';
+                document.getElementById('ml-largeur-field').style.display = 'none';
+            });
+        }
+        
+        function imprimerFacture() {
+            const clientId = document.getElementById('select-client').value;
+            
+            if (!clientId) {
+                showNotification('Veuillez sélectionner un client', 'error');
+                return;
+            }
+            
+            if (currentFacture.length === 0) {
+                showNotification('La facture est vide', 'error');
+                return;
+            }
+            
+            // Calculer les totaux
+            let totalHT = 0;
+            currentFacture.forEach(item => {
+                totalHT += item.montant;
+            });
+            
+            const tva = totalHT * 0.19;
+            const totalTTC = totalHT + tva;
+            
+            const factureData = {
+                numero: 'FACT-' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 10000),
+                date: new Date().toISOString().split('T')[0],
+                client_id: parseInt(clientId),
+                total_ht: totalHT.toFixed(2),
+                tva: tva.toFixed(2),
+                total: totalTTC.toFixed(2),
+                validee: false,
+                articles: currentFacture
+            };
+            
+            saveFactureToDB(factureData).then((savedFacture) => {
+                if (savedFacture) {
+                    generatePDF(savedFacture);
+                    currentFacture = [];
+                    updateFacturePreview();
+                }
+            });
+        }
+        
+        // GARDEZ TOUTES VOS AUTRES FONCTIONS
+        // ... [COLLER TOUTES VOS FONCTIONS JAVASCRIPT ICI] ...
+        
+        function showNotification(message, type = 'success') {
+            // Votre code notification existant
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${message}
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
